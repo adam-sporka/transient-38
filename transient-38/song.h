@@ -344,7 +344,126 @@ struct SONG
     }
   }
 
+  byte letterToNote(char c)
+  {
+    switch (c)
+    {
+      case 'C': return 60;
+      case 'D': return 62;
+      case 'E': return 64;
+      case 'F': return 65;
+      case 'G': return 67;
+      case 'A': return 69;
+      case 'B': return 71;
+    }
+    return 71;
+  }
+
+  void stringProgrammer(byte pattern, const __FlashStringHelper* input)
+  {
+    if (pattern > 31)
+    {
+      return;
+    }
+    byte state = 0;
+    byte pattern_pos = 0;
+    byte note = 0;
+    byte vibrato = false;
+    byte ramp = false;
+    byte octave = 4;
+    byte instrument = 0;
+    byte volume = 0;
+    PATTERN *p = patterns + pattern;
+
+    const char* data = (const char*)input;
+    for (byte i = 0; ; i++)
+    {
+      char c = pgm_read_byte_near(data++);
+      // Immediate
+      if (c == '*') { p->notes[pattern_pos++].pack(60, 4, 0, 0, 0); }
+      if (c == '+') { p->notes[pattern_pos++].pack(60, 5, 0, 0, 0); }
+      if (c == '.') { p->notes[pattern_pos++].pack(60, 6, 0, 0, 0); }
+      if (c == '(') { p->notes[pattern_pos++].pack(64, 7, 0, 0, 0); }
+      if (c == ')') { p->notes[pattern_pos++].pack(59, 7, 0, 0, 0); }        
+
+      // Compound
+      if (c >= 'A' && c <= 'G') {
+        vibrato = false;
+        ramp = false;
+        note = letterToNote(c) % 12; 
+      }
+      if (c == '#') note++;
+      if (c >= '0' && c <= '7') { octave = c - '0'; };
+      if (c == '~') vibrato = true;
+      if (c == '/') ramp = true;
+      if (c == '_') volume = 2;
+      if (c >= 'a' && c <= 'h') instrument = c - 'a';
+
+      if (c == ';')
+      {
+        p->notes[pattern_pos++].pack(note + (octave + 1) * 12, instrument, volume, vibrato, ramp);
+      }
+
+      // Break
+      if (c == '-')
+      {
+        p->notes[pattern_pos++].pack(0, 0, volume, vibrato, ramp);
+      }
+
+      if (c == 'x')
+      {
+        p->notes[pattern_pos++].pack(0x7f, 0, volume, vibrato, ramp);
+      }
+
+      if (c == '\0') break;  // End of string
+    } 
+  }
+
   void demo()
+  {
+    stringProgrammer(30, F(".... (... ..(. ...."));
+    stringProgrammer(0, F("aC2;--- C2;A#3;-C3; x---;A1;-xA#1;-"));
+    orders[0].choosePatterns(0, 30, 31);
+    orders[1].choosePatterns(0, 30, 31);
+    stringProgrammer(29, F("*... +... *.(* +())"));
+    orders[2].choosePatterns(0, 29, 31);
+    orders[3].choosePatterns(0, 29, 31);
+
+    stringProgrammer(1, F("a *-C2-;+...*C2;-*+A#0)"));
+    stringProgrammer(2, F("c_ C4;D4;G4;C4;D4;G4;xxC4;D4;G4;C4;D4;G4;xx"));
+
+    stringProgrammer(3, F("d C5;-C5;xG4~;--A;A#;A;A#;-G;"));
+    stringProgrammer(4, F("d F4;-F4;G4;F4;D#4;C;D#4~/;----x"));
+
+    orders[0].choosePatterns(1, 2, 31);
+    orders[1].choosePatterns(1, 2, 31);
+    orders[2].choosePatterns(1, 2, 3);
+    orders[3].choosePatterns(1, 2, 4);
+    orders[4].choosePatterns(1, 2, 3);
+    stringProgrammer(5, F("d F4;D#;F;G;F;D#;C;C;x"));
+    orders[5].choosePatterns(1, 2, 5);
+    orders[6].choosePatterns(1, 2, 3);
+    orders[7].choosePatterns(1, 2, 4);
+    orders[8].choosePatterns(1, 2, 3);
+    orders[9].choosePatterns(1, 2, 5);
+
+    stringProgrammer(6, F("a *-C#2-;+...*A#1;-*+A#1;)"));
+    stringProgrammer(7, F("c_ C#4;D#;F;C#;D#;F;xx;F;G;G#;F;G;G#;xx"));
+    stringProgrammer(8, F("c_ C4;D;E;C;D;E;xxC;D;E;C;D;E;xx"));
+    stringProgrammer(13, F("c_ ----x"));
+    stringProgrammer(9, F("d F;G;G#;A#;C5;C#;D#;C;C;C#;C;G#4;G;G#;C;E;"));
+    stringProgrammer(10, F("d -------G4;x"));
+    stringProgrammer(11, F("a *-C2-;+..A#1;x"));
+    stringProgrammer(12, F("c_ C4;D;E;C;D;E;F#;G;"));
+
+    orders[10].choosePatterns(6, 7, 9);
+    orders[11].choosePatterns(1, 8, 13);
+    orders[12].choosePatterns(6, 7, 9);
+    orders[13].choosePatterns(11, 12, 10);
+    song_length = 14;
+  }
+
+  void demo_()
   {
     patterns[0].make44Beat();
     patterns[1].make44Beat2();

@@ -102,7 +102,7 @@ struct INSTRUMENT
   {
     name = F("LEAD");
     setAttackDecay(0, 1, false);
-    setDefaultVolumePwm(4, 0, true);
+    setDefaultVolumePwm(3, 0, true);
     setFlags(0, INSTR_FLAG_DO_PWM);
     setForcedPitch(0);
   }

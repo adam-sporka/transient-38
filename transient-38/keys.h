@@ -67,7 +67,7 @@
 #define KEY_MONO_1        0
 #define KEY_MONO_2        1
 #define KEY_MONO_3        2
-#define KEY_POLY          3De 
+#define KEY_POLY          3
 #define KEY_UNISON        7
 
 #define KEY_PANIC         11
