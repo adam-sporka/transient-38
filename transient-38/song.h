@@ -359,6 +359,11 @@ struct SONG
     return 71;
   }
 
+  bool is_immediate(char c)
+  {
+    return c == '*' || c == '+' || c == '.' || c == '(' || c == ')' || c == '-' || c == 'x';
+  }
+
   void stringProgrammer(byte pattern, const __FlashStringHelper* input)
   {
     if (pattern > 31)
@@ -379,15 +384,28 @@ struct SONG
     for (byte i = 0; ; i++)
     {
       char c = pgm_read_byte_near(data++);
+
+      // Should flush note?
+      if (state == 1 && (is_immediate(c) || c == ';' || c == '\0'))
+      {
+        p->notes[pattern_pos++].pack(note + (octave + 1) * 12, instrument, volume, vibrato, ramp);
+        state = 0;
+      }
+
+      if (c == '\0') break;
+
       // Immediate
       if (c == '*') { p->notes[pattern_pos++].pack(60, 4, 0, 0, 0); }
       if (c == '+') { p->notes[pattern_pos++].pack(60, 5, 0, 0, 0); }
       if (c == '.') { p->notes[pattern_pos++].pack(60, 6, 0, 0, 0); }
       if (c == '(') { p->notes[pattern_pos++].pack(64, 7, 0, 0, 0); }
       if (c == ')') { p->notes[pattern_pos++].pack(59, 7, 0, 0, 0); }        
+      if (c == '-') { p->notes[pattern_pos++].pack(0, 0, volume, vibrato, ramp); }
+      if (c == 'x') { p->notes[pattern_pos++].pack(0x7f, 0, volume, vibrato, ramp); }
 
       // Compound
       if (c >= 'A' && c <= 'G') {
+        state = 1;
         vibrato = false;
         ramp = false;
         note = letterToNote(c) % 12; 
@@ -398,68 +416,56 @@ struct SONG
       if (c == '/') ramp = true;
       if (c == '_') volume = 2;
       if (c >= 'a' && c <= 'h') instrument = c - 'a';
-
-      if (c == ';')
-      {
-        p->notes[pattern_pos++].pack(note + (octave + 1) * 12, instrument, volume, vibrato, ramp);
-      }
-
-      // Break
-      if (c == '-')
-      {
-        p->notes[pattern_pos++].pack(0, 0, volume, vibrato, ramp);
-      }
-
-      if (c == 'x')
-      {
-        p->notes[pattern_pos++].pack(0x7f, 0, volume, vibrato, ramp);
-      }
-
-      if (c == '\0') break;  // End of string
     } 
   }
 
   void demo()
   {
-    stringProgrammer(30, F(".... (... ..(. ...."));
-    stringProgrammer(0, F("aC2;--- C2;A#3;-C3; x---;A1;-xA#1;-"));
-    orders[0].choosePatterns(0, 30, 31);
-    orders[1].choosePatterns(0, 30, 31);
-    stringProgrammer(29, F("*... +... *.(* +())"));
-    orders[2].choosePatterns(0, 29, 31);
-    orders[3].choosePatterns(0, 29, 31);
-
     stringProgrammer(1, F("a *-C2-;+...*C2;-*+A#0)"));
+    stringProgrammer(6, F("a *-C#2-;+...*A#1;-*+A#1;)"));
+    stringProgrammer(11, F("a *-C2-;+..A#1;x"));
+    stringProgrammer(14, F("a *-G#1-;+...*F2;-*+F2)"));
+    stringProgrammer(15, F("a *-A#1-;+...*D#2;-*+D#2)"));
+    stringProgrammer(16, F("a *-E2- +C2-. *G#2;-*+F;)"));
+    stringProgrammer(17, F("a F2-D2;G#-F;D-G"));
+
     stringProgrammer(2, F("c_ C4;D4;G4;C4;D4;G4;xxC4;D4;G4;C4;D4;G4;xx"));
+    stringProgrammer(7, F("c_ C#4;D#;F;C#;D#;F;xx;F;G;G#;F;G;G#;xx"));
+    stringProgrammer(8, F("c_ C4;D;E;C;D;E;xxC;D;E;C;D;E;xx"));
+    stringProgrammer(12, F("c_ C4;D;E;C;D;E;F#;G;"));
 
-    stringProgrammer(3, F("d C5;-C5;xG4~;--A;A#;A;A#;-G;"));
+    stringProgrammer(3, F("d C5-C5xG4~--A;A#;A;A#-G"));
     stringProgrammer(4, F("d F4;-F4;G4;F4;D#4;C;D#4~/;----x"));
-
-    orders[0].choosePatterns(1, 2, 31);
-    orders[1].choosePatterns(1, 2, 31);
-    orders[2].choosePatterns(1, 2, 3);
-    orders[3].choosePatterns(1, 2, 4);
-    orders[4].choosePatterns(1, 2, 3);
     stringProgrammer(5, F("d F4;D#;F;G;F;D#;C;C;x"));
+    stringProgrammer(9, F("d F4;G;G#;A#;C5;C#;D#;C-C#;C;G#4;G;G#;C;E;"));
+    stringProgrammer(13, F("c ----x"));
+    stringProgrammer(10, F("d -------G4x"));
+
+    orders[0].choosePatterns(6, 7, 9);
+    orders[1].choosePatterns(11, 12, 10);
+
+    orders[2].choosePatterns(14, 31, 31);
+    orders[3].choosePatterns(15, 31, 31);
+    orders[4].choosePatterns(16, 31, 31);
+    orders[5].choosePatterns(17, 31, 31);
+    // orders[1].choosePatterns(1, 31, 31);
+
+    // orders[0].choosePatterns(1, 2, 31);
+    // orders[1].choosePatterns(1, 2, 31);
+    orders[6].choosePatterns(1, 2, 3);
+    orders[7].choosePatterns(1, 2, 4);
+    /*
+    orders[4].choosePatterns(1, 2, 3);
     orders[5].choosePatterns(1, 2, 5);
     orders[6].choosePatterns(1, 2, 3);
     orders[7].choosePatterns(1, 2, 4);
     orders[8].choosePatterns(1, 2, 3);
     orders[9].choosePatterns(1, 2, 5);
-
-    stringProgrammer(6, F("a *-C#2-;+...*A#1;-*+A#1;)"));
-    stringProgrammer(7, F("c_ C#4;D#;F;C#;D#;F;xx;F;G;G#;F;G;G#;xx"));
-    stringProgrammer(8, F("c_ C4;D;E;C;D;E;xxC;D;E;C;D;E;xx"));
-    stringProgrammer(13, F("c_ ----x"));
-    stringProgrammer(9, F("d F;G;G#;A#;C5;C#;D#;C;C;C#;C;G#4;G;G#;C;E;"));
-    stringProgrammer(10, F("d -------G4;x"));
-    stringProgrammer(11, F("a *-C2-;+..A#1;x"));
-    stringProgrammer(12, F("c_ C4;D;E;C;D;E;F#;G;"));
-
     orders[10].choosePatterns(6, 7, 9);
     orders[11].choosePatterns(1, 8, 13);
     orders[12].choosePatterns(6, 7, 9);
     orders[13].choosePatterns(11, 12, 10);
+    */
     song_length = 14;
   }
 
