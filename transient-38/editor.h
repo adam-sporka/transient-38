@@ -54,6 +54,7 @@ public:
     lcd.write(number + '0');
   }
 
+#ifdef ARDUINO
   void flashMessage(const __FlashStringHelper* message, byte timeout = 64)
   {
     lcd.clear();
@@ -61,12 +62,15 @@ public:
     lcd.print(message);
     flash_message_timer = timeout;
   }
+#endif
 
+#ifdef ARDUINO
   void flashMessageL2(const __FlashStringHelper* message)
   {
     lcd.setCursor(0, 1);
     lcd.print(message);
   }
+#endif
 
   void updateScreen()
   {
@@ -238,7 +242,7 @@ public:
   }
 
   ////////
-  // PATTERN MODE
+  // SONG_PATTERN MODE
 
   void drawPattern()
   {
@@ -393,7 +397,7 @@ public:
   }
 
   ////////
-  // PATTERN MODE
+  // SONG_PATTERN MODE
 
   void drawPerformStatus()
   {
@@ -478,7 +482,12 @@ public:
       }
       if (keypad.consumePressed(KEY_MODE))
       {
-        switchMode((mode + 1) % EEditorMode::EDITOR_MODE_MAX);
+        switch (mode)
+        {
+        case EDITOR_MODE_SONG: switchMode(EEditorMode::EDITOR_MODE_PATTERNS); break;
+        case EDITOR_MODE_PATTERNS: switchMode(EEditorMode::EDITOR_MODE_PERFORM); break;
+        case EDITOR_MODE_PERFORM: switchMode(EEditorMode::EDITOR_MODE_SONG); break;
+        }
         return;
       }
     }
@@ -495,7 +504,7 @@ public:
         {
           if (mode == EDITOR_MODE_PATTERNS) 
           {
-            flashMessage(F("PLAYING PATTERN"));
+            flashMessage(F("PLAYING SONG_PATTERN"));
             song.play_pattern(current_pattern);
           }
           if (mode == EDITOR_MODE_SONG)

@@ -144,7 +144,7 @@ struct INSTRUMENT
   }
 };
 
-volatile INSTRUMENT instruments[8];
+ARDUINO_VOLATILE INSTRUMENT instruments[8];
 
 ////////////////////////////////////////////////////////////////
 class CVoice
@@ -187,7 +187,7 @@ public:
     if (v == 2) do_noise = true;
   }
 
-  void setInstrument(volatile INSTRUMENT &i)
+  void setInstrument(ARDUINO_VOLATILE INSTRUMENT &i)
   {
     volume_envelope.setup(0, i.getDefaultVolume(), i.getAtack(), i.getDecay(), i.isPercussive());
     do_noise = i.doNoise();
@@ -374,7 +374,7 @@ public:
     }
   }
 
-  void startNote(byte op, byte midi_note, volatile INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
+  void startNote(byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
   {
     voices[op]->setInstrument(i);
     voices[op]->setRuntimeParams(volume_decrement, do_vibrato, do_ramp);
@@ -527,6 +527,7 @@ public:
     }
   }
 
+#ifdef ARDUINO
   byte onSample()
   {
     byte update_thread = 0;
@@ -574,7 +575,35 @@ public:
     samples_since_tick++;
     return update_thread;
   }
-  
+#endif
+
+#ifdef _WIN32
+  byte getSample(bool &should_update_song)
+  {
+      should_update_song = false;
+      samples_served++;
+      if (samples_since_tick == 640)
+      {
+          onTick();
+          samples_since_tick = 0;
+      }
+      if (samples_since_tick == 320)
+      {
+          should_update_song = true;
+      }
+
+      // NOTE: No MIDI implementation
+
+      unsigned char out = 0;
+      out += op1.onSample();
+      out += op2.onSample();
+      out += op3.onSample();
+
+      samples_since_tick++;
+      return out;
+  }
+#endif
+
   void onTick()
   {
     ticks_served++;

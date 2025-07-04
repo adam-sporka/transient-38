@@ -19,7 +19,7 @@ struct NOTE
     N = (midi_note & 0x7f) | (N & 0x80);
   }
 
-  inline setInstrument(byte instrument)
+  inline void setInstrument(byte instrument)
   {
     IV = (IV & 0b11111000) | (instrument & 0x7);
   }
@@ -85,7 +85,7 @@ byte getChar(byte note)
 }
 
 ////////////////////////////////////////////////////////////////
-struct PATTERN
+struct SONG_PATTERN
 {
   NOTE notes[16];
 
@@ -185,7 +185,7 @@ struct PATTERN
 };
 
 // Global pattern pool
-volatile PATTERN patterns[32];
+ARDUINO_VOLATILE SONG_PATTERN patterns[32];
 
 ////////////////////////////////////////////////////////////////
 struct ORDER
@@ -287,7 +287,7 @@ struct SONG
     transport = 0;
   }
 
-  void onTick()
+  void onTick_()
   {
     if (!transport)
     {
@@ -296,7 +296,7 @@ struct SONG
 
     if (tick_counter == 0)
     {
-      volatile ORDER &o = orders[pos_order];
+      ARDUINO_VOLATILE ORDER &o = orders[pos_order];
       for (byte v = 0; v < 3; v++)
       {
         if (play_mode == PLAY_PATTERN)
@@ -304,10 +304,10 @@ struct SONG
           if (v > 0) break;
         }
 
-        volatile PATTERN *p;
+        ARDUINO_VOLATILE SONG_PATTERN *p;
         if (play_mode == PLAY_SONG) p = &patterns[o.v[v]];
         else p = &patterns[pattern_to_play];
-        volatile NOTE &n = p->notes[pos_pattern];
+        ARDUINO_VOLATILE NOTE &n = p->notes[pos_pattern];
         
         byte note = n.getNote();
         if (note == 127)
@@ -378,7 +378,7 @@ struct SONG
     byte octave = 4;
     byte instrument = 0;
     byte volume = 0;
-    PATTERN *p = patterns + pattern;
+    SONG_PATTERN *p = patterns + pattern;
 
     const char* data = (const char*)input;
     for (byte i = 0; ; i++)
@@ -518,4 +518,4 @@ struct SONG
   }
 };
 
-volatile SONG song;
+ARDUINO_VOLATILE SONG song;

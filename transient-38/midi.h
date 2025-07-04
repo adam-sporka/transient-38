@@ -1,3 +1,5 @@
+#ifdef ARDUINO
+
 byte midi_input;
 byte would_be_note;
 byte params_remaining = 0;
@@ -87,3 +89,4 @@ void checkMIDI()
   }
 }
     
+#endif

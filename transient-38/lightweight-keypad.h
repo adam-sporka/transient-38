@@ -39,8 +39,8 @@ class CLightweightKeypad
 private:
 
 public:
-  volatile uint16_t held;
-  volatile uint16_t pressed;
+  ARDUINO_VOLATILE uint16_t held;
+  ARDUINO_VOLATILE uint16_t pressed;
 
   // Instructions for the scanner
   // Perform one at a time, one per each update()
@@ -83,9 +83,9 @@ public:
     LWK_END             | 0,
   };
 
-  volatile byte step;
-  volatile byte scanned_key;
-  volatile byte last_key;
+  ARDUINO_VOLATILE byte step;
+  ARDUINO_VOLATILE byte scanned_key;
+  ARDUINO_VOLATILE byte last_key;
 
 public:
   void initialize()

@@ -1,3 +1,5 @@
+#define ARDUINO_VOLATILE volatile
+
 ////////////////////////////////////////////////////////////////
 // LCD
 ////////////////////////////////////////////////////////////////
@@ -14,25 +16,9 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #include "lightweight-keypad.h"
 volatile CLightweightKeypad keypad;
 
-////////////////////////////////////////////////////////////////
-// CONSTANTS & GLOBAL VARIABLES
-////////////////////////////////////////////////////////////////
-
-#include "pitches.h"
-const uint16_t sample_rate = 32000; // Samples per second
 const uint16_t xtal_divider = 500; // xtal_divider * sample_rate should be 16,000,000
 
-////////////////////////////////////////////////////////////////
-// SYNTH
-////////////////////////////////////////////////////////////////
-
-#include "synthesizer.h"
-volatile CSynthesizer synth;
-byte midi_panic = 0;
-
-#include "song.h"
-#include "editor.h"
-#include "midi.h"
+#include "main.h"
 
 void lcdPrintFromProgmem(const char* progmemStr) {
   char c;
@@ -86,7 +72,7 @@ ISR(TIMER1_COMPA_vect)
   bool update_thread = synth.onSample();
   if (update_thread == 1)
   {
-    song.onTick();
+    song.onTick_();
   }
 
   if (kbd_tick == 0)
