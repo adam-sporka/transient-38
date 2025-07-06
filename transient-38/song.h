@@ -364,29 +364,68 @@ struct SONG
     return c == '*' || c == '+' || c == '.' || c == '(' || c == ')' || c == '-' || c == 'x';
   }
 
-  void stringProgrammer(byte pattern, const __FlashStringHelper* input)
+  void stringProgrammer(const __FlashStringHelper* input)
   {
-    if (pattern > 31)
-    {
-      return;
-    }
-    byte state = 0;
+    byte state = 2;
     byte pattern_pos = 0;
     byte note = 0;
     byte vibrato = false;
     byte ramp = false;
-    byte octave = 4;
+    union
+    {
+        byte octave = 4;
+        byte voice;
+    };
     byte instrument = 0;
     byte volume = 0;
-    SONG_PATTERN *p = patterns + pattern;
+    SONG_PATTERN* p = nullptr;
+    ORDER* o = nullptr;
+
+    byte number = 0;
 
     const char* data = (const char*)input;
     for (byte i = 0; ; i++)
     {
       char c = pgm_read_byte_near(data++);
 
+      if (state == 2)
+      {
+          if (c >= '0' && c <= '9') number = number * 10 + (c - '0');
+          if (c == '=')
+          {
+              state = 0;
+              p = patterns + number;
+              number = 0;
+          }
+          if (c == ':')
+          {
+              state = 3;
+              voice = 0;
+              o = orders + number;
+              number = 0;
+          }
+          continue;
+      }
+
+      if (state == 3)
+      {
+          if (c >= '0' && c <= '9') number = number * 10 + (c - '0');
+          if (c <= 32)
+          {
+              o->v[voice] = number;
+              voice++;
+              number = 0;
+              if (c == '\0') break;
+          }
+      }
+
+      if (!p)
+      {
+          continue;
+      }
+
       // Should flush note?
-      if (state == 1 && (is_immediate(c) || c == ';' || c == '\0'))
+      if ((state == 1) && (is_immediate(c) || c == ';' || c == '\0'))
       {
         p->notes[pattern_pos++].pack(note + (octave + 1) * 12, instrument, volume, vibrato, ramp);
         state = 0;
@@ -394,17 +433,27 @@ struct SONG
 
       if (c == '\0') break;
 
-      // Immediate
+      // IMMEDIATE
+
+      // Bass drum
       if (c == '*') { p->notes[pattern_pos++].pack(60, 4, 0, 0, 0); }
+      // Snare drum
       if (c == '+') { p->notes[pattern_pos++].pack(60, 5, 0, 0, 0); }
+      // Hihat
       if (c == '.') { p->notes[pattern_pos++].pack(60, 6, 0, 0, 0); }
+      // Tom 1
       if (c == '(') { p->notes[pattern_pos++].pack(64, 7, 0, 0, 0); }
-      if (c == ')') { p->notes[pattern_pos++].pack(59, 7, 0, 0, 0); }        
+      // Tom 2
+      if (c == ')') { p->notes[pattern_pos++].pack(59, 7, 0, 0, 0); }
+      // Continue
       if (c == '-') { p->notes[pattern_pos++].pack(0, 0, volume, vibrato, ramp); }
+      // Stop
       if (c == 'x') { p->notes[pattern_pos++].pack(0x7f, 0, volume, vibrato, ramp); }
 
-      // Compound
-      if (c >= 'A' && c <= 'G') {
+      // COMPOUND
+
+      if (c >= 'A' && c <= 'G')
+      {
         state = 1;
         vibrato = false;
         ramp = false;
@@ -421,52 +470,38 @@ struct SONG
 
   void demo()
   {
-    stringProgrammer(1, F("a *-C2-;+...*C2;-*+A#0)"));
-    stringProgrammer(6, F("a *-C#2-;+...*A#1;-*+A#1;)"));
-    stringProgrammer(11, F("a *-C2-;+..A#1;x"));
-    stringProgrammer(14, F("a *-G#1-;+...*F2;-*+F2)"));
-    stringProgrammer(15, F("a *-A#1-;+...*D#2;-*+D#2)"));
-    stringProgrammer(16, F("a *-E2- +C2-. *G#2;-*+F;)"));
-    stringProgrammer(17, F("a F2-D2;G#-F;D-G"));
+      stringProgrammer(F("01=a *- C2 - +... *C2-*+A#0)"));
+      stringProgrammer(F("06=a *- C#2- +... *A#1-*+A#1)"));
+      stringProgrammer(F("11=a *- C2-  +..A#1;x"));
 
-    stringProgrammer(2, F("c_ C4;D4;G4;C4;D4;G4;xxC4;D4;G4;C4;D4;G4;xx"));
-    stringProgrammer(7, F("c_ C#4;D#;F;C#;D#;F;xx;F;G;G#;F;G;G#;xx"));
-    stringProgrammer(8, F("c_ C4;D;E;C;D;E;xxC;D;E;C;D;E;xx"));
-    stringProgrammer(12, F("c_ C4;D;E;C;D;E;F#;G;"));
+      stringProgrammer(F("02=c_ C4;D;G;C;D;G;xx C;D;G;C;D;G;xx"));
+      stringProgrammer(F("07=c_ C#4;D#;F;C#;D#;F;xx F;G;G#;F;G;G#;xx"));
+      stringProgrammer(F("08=c_ C4;D;E;C;D;E;xx C;D;E;C;D;E;xx"));
+      stringProgrammer(F("12=c_ C4;D;E;C;D;E;F#;G;"));
 
-    stringProgrammer(3, F("d C5-C5xG4~--A;A#;A;A#-G"));
-    stringProgrammer(4, F("d F4;-F4;G4;F4;D#4;C;D#4~/;----x"));
-    stringProgrammer(5, F("d F4;D#;F;G;F;D#;C;C;x"));
-    stringProgrammer(9, F("d F4;G;G#;A#;C5;C#;D#;C-C#;C;G#4;G;G#;C;E;"));
-    stringProgrammer(13, F("c ----x"));
-    stringProgrammer(10, F("d -------G4x"));
+      stringProgrammer(F("03=d C5--x G4~--A; A#;A;A#;- G;"));
+      stringProgrammer(F("04=d F4--G;F;D#;C;D#~/;----x"));
+      stringProgrammer(F("05=d F4;D#;F;G;F;D#;C;C;x"));
+      stringProgrammer(F("09=d F4;G;G#;A#;C5;C#;D#;C;C;C#;C;G#4;G;G#;C;E;"));
+      stringProgrammer(F("13=d ----~--------x"));
+      stringProgrammer(F("10=d ----~---G4;x"));
 
-    orders[0].choosePatterns(6, 7, 9);
-    orders[1].choosePatterns(11, 12, 10);
+      stringProgrammer(F("00:01 02 31"));
+      stringProgrammer(F("01:01 02 31"));
+      stringProgrammer(F("02:01 02 03"));
+      stringProgrammer(F("03:01 02 04"));
+      stringProgrammer(F("04:01 02 03"));
+      stringProgrammer(F("05:01 02 05"));
+      stringProgrammer(F("06:01 02 03"));
+      stringProgrammer(F("07:01 02 04"));
+      stringProgrammer(F("08:01 02 03"));
+      stringProgrammer(F("09:01 02 05"));
+      stringProgrammer(F("10:06 07 09"));
+      stringProgrammer(F("11:01 08 13"));
+      stringProgrammer(F("12:06 07 09"));
+      stringProgrammer(F("13:11 12 10"));
 
-    orders[2].choosePatterns(14, 31, 31);
-    orders[3].choosePatterns(15, 31, 31);
-    orders[4].choosePatterns(16, 31, 31);
-    orders[5].choosePatterns(17, 31, 31);
-    // orders[1].choosePatterns(1, 31, 31);
-
-    // orders[0].choosePatterns(1, 2, 31);
-    // orders[1].choosePatterns(1, 2, 31);
-    orders[6].choosePatterns(1, 2, 3);
-    orders[7].choosePatterns(1, 2, 4);
-    /*
-    orders[4].choosePatterns(1, 2, 3);
-    orders[5].choosePatterns(1, 2, 5);
-    orders[6].choosePatterns(1, 2, 3);
-    orders[7].choosePatterns(1, 2, 4);
-    orders[8].choosePatterns(1, 2, 3);
-    orders[9].choosePatterns(1, 2, 5);
-    orders[10].choosePatterns(6, 7, 9);
-    orders[11].choosePatterns(1, 8, 13);
-    orders[12].choosePatterns(6, 7, 9);
-    orders[13].choosePatterns(11, 12, 10);
-    */
-    song_length = 14;
+      song_length = 14;
   }
 
   void demo_()
@@ -503,6 +538,7 @@ struct SONG
     orders[13].choosePatterns( 0, 0x11, 0x19);
     orders[14].choosePatterns(0,  0x12, 0x1a);
     orders[15].choosePatterns(31, 0x13, 0x1b);
+    song_length = 16;
   }
 
   SONG()

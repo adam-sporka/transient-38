@@ -13,48 +13,65 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\transient-38">
+      <UniqueIdentifier>{a9230d80-7cb6-4322-86a6-fee0908adbd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cmdline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="waveout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\transient-38\display-setup.h">
+    <ClInclude Include="waveout.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\transient-38\display-setup.h">
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\editor.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\envelope.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\keys.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\lfo.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\lightweight-keypad.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\main.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\midi.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\pitches.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\random.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\song.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\transient-38</Filter>
     </ClInclude>
     <ClInclude Include="..\transient-38\synthesizer.h">
+      <Filter>Source Files\transient-38</Filter>
+    </ClInclude>
+    <ClInclude Include="arduino_bypass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="arduino_bypass.inc">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
