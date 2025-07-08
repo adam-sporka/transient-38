@@ -21,14 +21,8 @@
     <ClCompile Include="cmdline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="waveout.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="waveout.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\transient-38\display-setup.h">
       <Filter>Source Files\transient-38</Filter>
     </ClInclude>

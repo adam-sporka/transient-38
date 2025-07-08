@@ -390,18 +390,18 @@ struct SONG
 
       if (state == 2)
       {
+          if (c == 'O')
+          {
+              state = 3;
+              number = 0;
+              o = orders + (song_length++);
+              voice = 0;
+          }
           if (c >= '0' && c <= '9') number = number * 10 + (c - '0');
           if (c == '=')
           {
               state = 0;
               p = patterns + number;
-              number = 0;
-          }
-          if (c == ':')
-          {
-              state = 3;
-              voice = 0;
-              o = orders + number;
               number = 0;
           }
           continue;
@@ -470,14 +470,29 @@ struct SONG
 
   void demo()
   {
+      song_length = 0;
+
       stringProgrammer(F("01=a *- C2 - +... *C2-*+A#0)"));
       stringProgrammer(F("06=a *- C#2- +... *A#1-*+A#1)"));
       stringProgrammer(F("11=a *- C2-  +..A#1;x"));
+      stringProgrammer(F("14=a *- G#1- +... *A#1-*+A#1)"));
+      stringProgrammer(F("15=a *- G#1- +... *F-*+F2)"));
+      stringProgrammer(F("25=a *G1-- *G#-- *A-- *A#-B"));
 
       stringProgrammer(F("02=c_ C4;D;G;C;D;G;xx C;D;G;C;D;G;xx"));
       stringProgrammer(F("07=c_ C#4;D#;F;C#;D#;F;xx F;G;G#;F;G;G#;xx"));
       stringProgrammer(F("08=c_ C4;D;E;C;D;E;xx C;D;E;C;D;E;xx"));
       stringProgrammer(F("12=c_ C4;D;E;C;D;E;F#;G;"));
+
+      stringProgrammer(F("16=b_ G#4~--- ---- G4~--- F4~---"));
+      stringProgrammer(F("17=b_ E4~-F;G x"));
+      stringProgrammer(F("18=b_ G#4~--- ---- A#4~--- F4~--E"));
+      stringProgrammer(F("19=b_ x"));
+
+      stringProgrammer(F("20=b_ C4--- D#--- C;D;D#x C4;C#;x-"));
+      stringProgrammer(F("21=b_ C4-D;E; x"));
+      stringProgrammer(F("22=b_ C4--- F--- G;G#;G;x D~--C"));
+      stringProgrammer(F("24=b_ x"));
 
       stringProgrammer(F("03=d C5--x G4~--A; A#;A;A#;- G;"));
       stringProgrammer(F("04=d F4--G;F;D#;C;D#~/;----x"));
@@ -486,22 +501,33 @@ struct SONG
       stringProgrammer(F("13=d ----~--------x"));
       stringProgrammer(F("10=d ----~---G4;x"));
 
-      stringProgrammer(F("00:01 02 31"));
-      stringProgrammer(F("01:01 02 31"));
-      stringProgrammer(F("02:01 02 03"));
-      stringProgrammer(F("03:01 02 04"));
-      stringProgrammer(F("04:01 02 03"));
-      stringProgrammer(F("05:01 02 05"));
-      stringProgrammer(F("06:01 02 03"));
-      stringProgrammer(F("07:01 02 04"));
-      stringProgrammer(F("08:01 02 03"));
-      stringProgrammer(F("09:01 02 05"));
-      stringProgrammer(F("10:06 07 09"));
-      stringProgrammer(F("11:01 08 13"));
-      stringProgrammer(F("12:06 07 09"));
-      stringProgrammer(F("13:11 12 10"));
+      stringProgrammer(F("O:01 02 31"));
+      stringProgrammer(F("O:01 02 31"));
 
-      song_length = 14;
+      stringProgrammer(F("O:01 02 03"));
+      stringProgrammer(F("O:01 02 04"));
+      stringProgrammer(F("O:01 02 03"));
+      stringProgrammer(F("O:01 02 05"));
+      stringProgrammer(F("O:01 02 03"));
+      stringProgrammer(F("O:01 02 04"));
+      stringProgrammer(F("O:01 02 03"));
+      stringProgrammer(F("O:01 02 05"));
+
+      stringProgrammer(F("O:06 07 09"));
+      stringProgrammer(F("O:01 08 13"));
+      stringProgrammer(F("O:06 07 09"));
+      stringProgrammer(F("O:11 12 10"));
+
+      stringProgrammer(F("O:14 16 31"));
+      stringProgrammer(F("O:01 17 31"));
+      stringProgrammer(F("O:15 18 31"));
+      stringProgrammer(F("O:01 19 31"));
+      stringProgrammer(F("O:14 16 20"));
+      stringProgrammer(F("O:01 17 21"));
+      stringProgrammer(F("O:15 18 22"));
+      stringProgrammer(F("O:25 19 24"));
+
+      // song_length = 14;
   }
 
   void demo_()

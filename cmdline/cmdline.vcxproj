@@ -132,7 +132,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cmdline.cpp" />
-    <ClCompile Include="waveout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\transient-38\display-setup.h" />
@@ -148,7 +147,6 @@
     <ClInclude Include="..\transient-38\song.h" />
     <ClInclude Include="..\transient-38\synthesizer.h" />
     <ClInclude Include="arduino_bypass.h" />
-    <ClInclude Include="waveout.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="arduino_bypass.inc" />
