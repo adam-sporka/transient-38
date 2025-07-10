@@ -474,8 +474,6 @@ struct SONG
 
   void demo()
   {
-      song_length = 0;
-
       stringProgrammer(F("01=a *- C2 - +... *C2-*+A#0)"));
       stringProgrammer(F("06=a *- C#2- +... *A#1-*+A#1)"));
       stringProgrammer(F("11=a *- C2-  +..A#1;x"));
@@ -511,7 +509,7 @@ struct SONG
       stringProgrammer(F("13=d ----~--------x"));
       stringProgrammer(F("10=d ----~---G4;x"));
 
-      // stringProgrammer(F("O:26 28 31"));
+      song_length = 0;
 
       stringProgrammer(F("O:27 19 19"));
       stringProgrammer(F("O:27 19 31"));
@@ -546,9 +544,7 @@ struct SONG
       stringProgrammer(F("O:26 28 19"));
 
       song_repeat_from = 4;
-
-      // song_length = 14;
-      }
+  }
 
   void demo_()
   {
