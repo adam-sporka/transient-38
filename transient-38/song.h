@@ -211,7 +211,8 @@ struct ORDER
 struct SONG
 {
   ORDER orders[32];
-  byte song_length = 16;
+  byte song_length = 1;
+  byte song_repeat_from = 0;
 
   byte pos_order = 0;
   byte pos_pattern = 0;
@@ -334,7 +335,7 @@ struct SONG
 
         if (pos_order >= song_length)
         {
-          pos_order = 0;
+          pos_order = song_repeat_from;
         }
       }
     }
@@ -463,7 +464,10 @@ struct SONG
       if (c >= '0' && c <= '7') { octave = c - '0'; };
       if (c == '~') vibrato = true;
       if (c == '/') ramp = true;
-      if (c == '_') volume = 2;
+      if (c == '_') {
+          if (volume == 0) volume = 2;
+          else volume = 3;
+      }
       if (c >= 'a' && c <= 'h') instrument = c - 'a';
     } 
   }
@@ -477,7 +481,7 @@ struct SONG
       stringProgrammer(F("11=a *- C2-  +..A#1;x"));
       stringProgrammer(F("14=a *- G#1- +... *A#1-*+A#1)"));
       stringProgrammer(F("15=a *- G#1- +... *F-*+F2)"));
-      stringProgrammer(F("25=a *G1-- *G#-- *A-- *A#-B"));
+      stringProgrammer(F("26=a *G1-- *G#-- *A-- *A#-B"));
 
       stringProgrammer(F("02=c_ C4;D;G;C;D;G;xx C;D;G;C;D;G;xx"));
       stringProgrammer(F("07=c_ C#4;D#;F;C#;D#;F;xx F;G;G#;F;G;G#;xx"));
@@ -488,11 +492,12 @@ struct SONG
       stringProgrammer(F("17=b_ E4~-F;G x"));
       stringProgrammer(F("18=b_ G#4~--- ---- A#4~--- F4~--E"));
       stringProgrammer(F("19=b_ x"));
+      stringProgrammer(F("25=c_ x----G4;C5;G;C6;G5;C;G4;C5;E;C6;A#5"));
 
-      stringProgrammer(F("20=b_ C4--- D#--- C;D;D#x C4;C#;x-"));
-      stringProgrammer(F("21=b_ C4-D;E; x"));
-      stringProgrammer(F("22=b_ C4--- F--- G;G#;G;x D~--C"));
-      stringProgrammer(F("24=b_ x"));
+      stringProgrammer(F("20=b__ C4--- D#--- C;D;D#x C4;C#;x-"));
+      stringProgrammer(F("21=b__ C4-D;E; x"));
+      stringProgrammer(F("22=b__ C4--- F--- G;G#;G;x D~--C"));
+      stringProgrammer(F("24=b__ x"));
 
       stringProgrammer(F("03=d C5--x G4~--A; A#;A;A#;- G;"));
       stringProgrammer(F("04=d F4--G;F;D#;C;D#~/;----x"));
@@ -500,6 +505,10 @@ struct SONG
       stringProgrammer(F("09=d F4;G;G#;A#;C5;C#;D#;C;C;C#;C;G#4;G;G#;C;E;"));
       stringProgrammer(F("13=d ----~--------x"));
       stringProgrammer(F("10=d ----~---G4;x"));
+
+      stringProgrammer(F("O:01 31 31"));
+      stringProgrammer(F("O:01 31 31"));
+      stringProgrammer(F("O:26 31 31"));
 
       stringProgrammer(F("O:01 02 31"));
       stringProgrammer(F("O:01 02 31"));
@@ -521,11 +530,13 @@ struct SONG
       stringProgrammer(F("O:14 16 31"));
       stringProgrammer(F("O:01 17 31"));
       stringProgrammer(F("O:15 18 31"));
-      stringProgrammer(F("O:01 19 31"));
+      stringProgrammer(F("O:01 25 31"));
       stringProgrammer(F("O:14 16 20"));
       stringProgrammer(F("O:01 17 21"));
       stringProgrammer(F("O:15 18 22"));
-      stringProgrammer(F("O:25 19 24"));
+      stringProgrammer(F("O:26 19 24"));
+
+      song_repeat_from = 3;
 
       // song_length = 14;
   }
