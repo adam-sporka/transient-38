@@ -482,6 +482,11 @@ struct SONG
       stringProgrammer(F("14=a *- G#1- +... *A#1-*+A#1)"));
       stringProgrammer(F("15=a *- G#1- +... *F-*+F2)"));
       stringProgrammer(F("26=a *G1-- *G#-- *A-- *A#-B"));
+      stringProgrammer(F("27=a *- C2 - +--- *C2-*+A#0)"));
+      stringProgrammer(F("28=b__ xG3~-- xG#~-- xA~-- xA#~-B"));
+
+      stringProgrammer(F("29=c C5-xD ---- x--- ---G4"));
+      stringProgrammer(F("30=c x--- ---- ---C D;x;x;x"));
 
       stringProgrammer(F("02=c_ C4;D;G;C;D;G;xx C;D;G;C;D;G;xx"));
       stringProgrammer(F("07=c_ C#4;D#;F;C#;D#;F;xx F;G;G#;F;G;G#;xx"));
@@ -506,9 +511,12 @@ struct SONG
       stringProgrammer(F("13=d ----~--------x"));
       stringProgrammer(F("10=d ----~---G4;x"));
 
-      stringProgrammer(F("O:01 31 31"));
-      stringProgrammer(F("O:01 31 31"));
-      stringProgrammer(F("O:26 31 31"));
+      // stringProgrammer(F("O:26 28 31"));
+
+      stringProgrammer(F("O:27 19 19"));
+      stringProgrammer(F("O:27 19 31"));
+      stringProgrammer(F("O:01 19 31"));
+      stringProgrammer(F("O:26 28 19"));
 
       stringProgrammer(F("O:01 02 31"));
       stringProgrammer(F("O:01 02 31"));
@@ -535,11 +543,12 @@ struct SONG
       stringProgrammer(F("O:01 17 21"));
       stringProgrammer(F("O:15 18 22"));
       stringProgrammer(F("O:26 19 24"));
+      stringProgrammer(F("O:26 28 19"));
 
-      song_repeat_from = 3;
+      song_repeat_from = 4;
 
       // song_length = 14;
-  }
+      }
 
   void demo_()
   {

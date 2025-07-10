@@ -475,8 +475,8 @@ public:
     {
       if (first_tick)
       {
-        flashMessage(F("DEMO"));
         song.demo();
+        flashMessage(F("DEMO"));
         first_tick = false;
         return;
       }

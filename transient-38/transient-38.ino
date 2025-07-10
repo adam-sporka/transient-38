@@ -58,7 +58,7 @@ void setup()
     TIMSK1 |= (1 << OCIE1A);   // Enable timer compare interrupt
   sei();                       // Enable global interrupts
 
-  editor.flashMessage(F("Transient 38 /v2"), 64);
+  editor.flashMessage(F("Transient 38 /v2"), 640);
   editor.flashMessageL2(F("by AdamJ/MovSD"));
 }
 
