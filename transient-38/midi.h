@@ -30,6 +30,7 @@ void checkMIDI()
     if (is_sysex && (midi_input == 0xf7))
     {
       is_sysex = 0;
+      return;
     }
 
     if (params_remaining == 0)
@@ -58,47 +59,25 @@ void checkMIDI()
       {
         if (midi_input > 0) 
         {
-          midi_note_in = would_be_note;
-          midi_note_in_channel = commandByte & 0xf;
+          midi_note_in_[midi_note_in_wr] = would_be_note;
+          midi_note_in_channel_[midi_note_in_wr] = commandByte & 0xf;
+          midi_note_in_wr = (midi_note_in_wr + 1) & CONTROL_BUFFER_MASK;
         }
         else
         {
-          midi_note_kill = would_be_note;
-          midi_note_kill_channel = commandByte & 0xf;
+          midi_note_kill_[midi_note_kill_wr] = would_be_note;
+          midi_note_kill_channel_[midi_note_kill_wr] = commandByte & 0xf;
+          midi_note_kill_wr = (midi_note_kill_wr + 1) & CONTROL_BUFFER_MASK;
         }
       }
       if ((params_remaining == 1) && (commandByte >= 128) && (commandByte <= 143))
       {
-        midi_note_kill = would_be_note;
-        midi_note_kill_channel = commandByte & 0xf;
+        midi_note_kill_[midi_note_kill_wr] = would_be_note;
+        midi_note_kill_channel_[midi_note_kill_wr] = commandByte & 0xf;
+        midi_note_kill_wr = (midi_note_kill_wr + 1) & CONTROL_BUFFER_MASK;
       }
       params_remaining--;
     }
-
-/*
-    if (midi_note_in)
-    {
-      synth.onMidiNoteOn(midi_note_in_channel, midi_note_in, 0xf);
-      midi_note_in = 0;
-    }
-
-    if (midi_note_kill)
-    {
-      synth.onMidiNoteOff(midi_note_kill_channel, midi_note_kill, 0xf);
-      midi_note_kill = 0;
-    }
-*/
-/*
-    if (midi_note_in || midi_note_kill)
-    {
-      Serial.print(F("ON "));
-      Serial.print(midi_note_in);
-      Serial.print(F(" OFF "));
-      Serial.println(midi_note_kill);
-      midi_note_in = 0;
-      midi_note_kill = 0;
-    }
-*/
   }
 }
     

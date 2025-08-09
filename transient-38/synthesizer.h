@@ -18,10 +18,19 @@ LFO pwm;
 
 #define INSTR_DELAYED_VIBRATO     0x80
 
-byte midi_note_in = 0;
-byte midi_note_in_channel = 0;
-byte midi_note_kill = 0;
-byte midi_note_kill_channel = 0;
+#define CONTROL_BUFFER_LENGTH 8
+#define CONTROL_BUFFER_MASK 7
+
+volatile byte midi_note_in_[CONTROL_BUFFER_LENGTH];
+volatile byte midi_note_in_channel_[CONTROL_BUFFER_LENGTH];
+volatile byte midi_note_in_rd = 0;
+volatile byte midi_note_in_wr = 0;
+
+volatile byte midi_note_kill_[CONTROL_BUFFER_LENGTH];
+volatile byte midi_note_kill_channel_[CONTROL_BUFFER_LENGTH];
+volatile byte midi_note_kill_rd = 0;
+volatile byte midi_note_kill_wr = 0;
+
 byte mono_voice = 0xff; // 0xff == poly
 
 struct INSTRUMENT
@@ -376,6 +385,11 @@ public:
 
   __attribute__((always_inline)) inline void startNote(byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
   {
+    for (byte v = 0; v < 3; ++v) {
+        if (v != op && voices[v]->isPlaying() && voices[v]->midi_note == midi_note) {
+            voices[v]->panic(); // terminate immediately
+        }
+    }
     voices[op]->setInstrument(i);
     voices[op]->setRuntimeParams(volume_decrement, do_vibrato, do_ramp);
     voices[op]->setPitch(midi_note, unison);
@@ -533,23 +547,26 @@ public:
     byte update_thread = 0;
     // samples_served++;
 
+    // now = next_value << 2;
+    PORTB = (PORTB & 0b11000011) | ((next_value & 0xf) << 2);
+
     // Write thre _previous_ values, so that this happens as the first operation of the interrupt handler.
     // Also, write only if there is a change.
-    now = next_value & 1; if ((last1 & !now) | (!last1 & now)) { digitalWrite(10, now); last1 = now; }
-    now = next_value & 2; if ((last2 & !now) | (!last2 & now)) { digitalWrite(11, now); last2 = now; }
-    now = next_value & 4; if ((last3 & !now) | (!last3 & now)) { digitalWrite(12, now); last3 = now; }
-    now = next_value & 8; if ((last4 & !now) | (!last4 & now)) { digitalWrite(13, now); last4 = now; }
+    //now = next_value & 1; if ((last1 & !now) | (!last1 & now)) { digitalWrite(10, now); last1 = now; }
+    //now = next_value & 2; if ((last2 & !now) | (!last2 & now)) { digitalWrite(11, now); last2 = now; }
+    //now = next_value & 4; if ((last3 & !now) | (!last3 & now)) { digitalWrite(12, now); last3 = now; }
+    //now = next_value & 8; if ((last4 & !now) | (!last4 & now)) { digitalWrite(13, now); last4 = now; }
 
-    if (midi_note_in)
+    while (midi_note_in_rd != midi_note_in_wr)
     {
-      onMidiNoteOn(midi_note_in_channel, midi_note_in, 127);
-      midi_note_in = 0;
+      onMidiNoteOn(midi_note_in_channel_[midi_note_in_rd], midi_note_in_[midi_note_in_rd], 127);
+      midi_note_in_rd = (midi_note_in_rd + 1) & CONTROL_BUFFER_MASK;
     }
 
-    if (midi_note_kill)
+    while (midi_note_kill_rd != midi_note_kill_wr)
     {
-      onMidiNoteOff(midi_note_kill_channel, midi_note_kill, 127);
-      midi_note_kill = 0;
+      onMidiNoteOff(midi_note_kill_channel_[midi_note_kill_rd], midi_note_kill_[midi_note_kill_rd], 127);
+      midi_note_kill_rd = (midi_note_kill_rd + 1) & CONTROL_BUFFER_MASK;
     }
 
     if (samples_since_tick == 640)

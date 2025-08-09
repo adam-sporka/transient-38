@@ -17,6 +17,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 volatile CLightweightKeypad keypad;
 
 const uint16_t xtal_divider = 500; // xtal_divider * sample_rate should be 16,000,000
+// const uint16_t xtal_divider = 1000; // xtal_divider * sample_rate should be 16,000,000
 
 #include "main.h"
 

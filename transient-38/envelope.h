@@ -44,6 +44,13 @@ struct ENVELOPE
     counter = 0;
   }
 
+  __attribute__((always_inline)) inline void kill()
+  {
+    phase = ENV_PHASE_OUTSIDE;
+    val = min;
+    counter = 0;
+  }
+
   __attribute__((always_inline)) inline void panic()
   {
     phase = ENV_PHASE_OUTSIDE;
