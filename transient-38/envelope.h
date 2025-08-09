@@ -23,12 +23,12 @@ struct ENVELOPE
     oneshot = oneshot_;
   }
 
-  inline bool isPlaying()
+  __attribute__((always_inline)) inline bool isPlaying()
   {
     return phase != ENV_PHASE_OUTSIDE;
   }
 
-  void gateOn(bool do_retrig)
+  __attribute__((always_inline)) inline void gateOn(bool do_retrig)
   {
     if (do_retrig || ((!do_retrig) && (phase != ENV_PHASE_HOLD)))
     {
@@ -38,20 +38,20 @@ struct ENVELOPE
     }
   }
 
-  void gateOff()
+  __attribute__((always_inline)) inline void gateOff()
   {
     phase = ENV_PHASE_DECAY;
     counter = 0;
   }
 
-  void panic()
+  __attribute__((always_inline)) inline void panic()
   {
     phase = ENV_PHASE_OUTSIDE;
     val = min;
     counter = 0;
   }
 
-  void update()
+  __attribute__((always_inline)) inline void update()
   {
     if (phase == ENV_PHASE_OUTSIDE)
     {

@@ -24,8 +24,30 @@
 
 #define LWK_ROWS 4
 #define LWK_COLS 4
-byte LWK_PINS_ROWS[LWK_ROWS] = {5, 4, 3, 2};
-byte LWK_PINS_COLS[LWK_COLS] = {6, 7, 8, 9};
+// byte LWK_PINS_ROWS[LWK_ROWS] = {5, 4, 3, 2};
+// byte LWK_PINS_COLS[LWK_COLS] = {6, 7, 8, 9};
+
+byte LWK_PINS_ROWS_(byte row)
+{
+  switch (row)
+  {
+    case 0: return 5;
+    case 1: return 4;
+    case 2: return 3;
+    case 3: return 2;
+  }
+}
+
+byte LWK_PINS_COLS_(byte col)
+{
+  switch (col)
+  {
+    case 0: return 6;
+    case 1: return 7;
+    case 2: return 8;
+    case 3: return 9;
+  }
+}
 
 #define LWK_START 0x20
 #define LWK_DEACTIVATE_ROW 0x30
@@ -92,12 +114,12 @@ public:
   {
     for (int r = 0; r < LWK_ROWS; r++) 
     {
-      pinMode(LWK_PINS_ROWS[r], OUTPUT);  
-      digitalWrite(LWK_PINS_ROWS[r], LOW);
+      pinMode(LWK_PINS_ROWS_(r), OUTPUT);  
+      digitalWrite(LWK_PINS_ROWS_(r), LOW);
     }
     for (int c = 0; c < LWK_COLS; c++)
     {
-      pinMode(LWK_PINS_COLS[c], INPUT_PULLUP);  
+      pinMode(LWK_PINS_COLS_(c), INPUT_PULLUP);  
     }
     step = 0;         // Step in the "action list"
     scanned_key = 0;  // Key being currently looked at
@@ -120,16 +142,16 @@ public:
     case LWK_START:
       break;
     case LWK_ACTIVATE_ROW:
-      digitalWrite(LWK_PINS_ROWS[current_parameter], HIGH);
+      digitalWrite(LWK_PINS_ROWS_(current_parameter), HIGH);
       break;
     case LWK_DEACTIVATE_ROW:
-      digitalWrite(LWK_PINS_ROWS[current_parameter], LOW);
+      digitalWrite(LWK_PINS_ROWS_(current_parameter), LOW);
       break;
     case LWK_READ_COLUMN:
       {
         uint16_t weight = 1 << scanned_key;
         // Key is down
-        if (digitalRead(LWK_PINS_COLS[current_parameter]) == LOW)
+        if (digitalRead(LWK_PINS_COLS_(current_parameter)) == LOW)
         {
           // Just pressed
           if (!(held & weight))

@@ -503,7 +503,7 @@ struct SONG
       stringProgrammer(F("24=b__ x"));
 
       stringProgrammer(F("03=d C5--x G4~--A; A#;A;A#;- G;"));
-      stringProgrammer(F("04=d F4--G;F;D#;C;D#~/;----x"));
+      stringProgrammer(F("04=d F4--G;F;D#;C;D#~;----x"));
       stringProgrammer(F("05=d F4;D#;F;G;F;D#;C;C;x"));
       stringProgrammer(F("09=d F4;G;G#;A#;C5;C#;D#;C;C;C#;C;G#4;G;G#;C;E;"));
       stringProgrammer(F("13=d ----~--------x"));
@@ -511,9 +511,9 @@ struct SONG
 
       song_length = 0;
 
-      stringProgrammer(F("O:27 19 19"));
-      stringProgrammer(F("O:27 19 31"));
-      stringProgrammer(F("O:01 19 31"));
+      //stringProgrammer(F("O:27 19 19"));
+      //stringProgrammer(F("O:27 19 31"));
+      //stringProgrammer(F("O:01 19 31"));
       stringProgrammer(F("O:26 28 19"));
 
       stringProgrammer(F("O:01 02 31"));
@@ -543,7 +543,7 @@ struct SONG
       stringProgrammer(F("O:26 19 24"));
       stringProgrammer(F("O:26 28 19"));
 
-      song_repeat_from = 4;
+      song_repeat_from = 1;
   }
 
   void demo_()

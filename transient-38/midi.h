@@ -4,6 +4,7 @@ byte midi_input;
 byte would_be_note;
 byte params_remaining = 0;
 byte commandByte;
+byte is_sysex = 0;
 
 void checkMIDI()
 {
@@ -19,6 +20,18 @@ void checkMIDI()
   if (Serial.available())
   {
     midi_input = Serial.read();
+
+    if (!is_sysex && (midi_input == 0xf0))
+    {
+      is_sysex = 1;
+      return;
+    }
+
+    if (is_sysex && (midi_input == 0xf7))
+    {
+      is_sysex = 0;
+    }
+
     if (params_remaining == 0)
     {
       if (midi_input < 128)

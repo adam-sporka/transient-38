@@ -58,31 +58,23 @@ void setup()
     TIMSK1 |= (1 << OCIE1A);   // Enable timer compare interrupt
   sei();                       // Enable global interrupts
 
-  editor.flashMessage(F("Transient 38 /v2"), 640);
+  editor.flashMessage(F("Transient 38 /v3"), 255);
   editor.flashMessageL2(F("by AdamJ/MovSD"));
 }
 
 ////////////////////////////////////////////////////////////////
 
 unsigned char kbd_tick = 0;
-unsigned char midi_tick = 25;
+unsigned char midi_tick = 15;
 
 ISR(TIMER1_COMPA_vect)
 {
-  bool update_thread = synth.onSample();
-  //if (update_thread == 1)
-  //{
-  //  song.onTick_();
-  //}
+  checkMIDI();
 
-  if (midi_tick == 0)
+  bool update_thread = synth.onSample();
+  if (update_thread == 1)
   {
-    midi_tick = 60;
-    checkMIDI();
-  }
-  else
-  {
-    midi_tick--;
+    song.onTick_();
   }
 
   if (kbd_tick == 0)

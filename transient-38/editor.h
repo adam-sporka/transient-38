@@ -34,12 +34,12 @@ public:
     }
   }
 
-  void flashMessage(const char* message, byte timeout = 64)
+  void flashMessage(const char* message, byte timeout = 16)
   {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(message);
-    flash_message_timer = timeout;
+    flash_message_timer = timeout * 16;
   }
 
   void flashMessageL2(const char* message)
@@ -122,9 +122,9 @@ public:
     mode = new_mode;
     switch (new_mode)
     {
-      case EDITOR_MODE_SONG: flashMessage(F("SONG")); break;
-      case EDITOR_MODE_PATTERNS: flashMessage(F("PATTERNS")); break;
-      case EDITOR_MODE_PERFORM: flashMessage(F("PERFORM")); break;
+      case EDITOR_MODE_SONG: flashMessage(F("SONG MODE")); break;
+      case EDITOR_MODE_PATTERNS: flashMessage(F("PATTERN MODE")); break;
+      case EDITOR_MODE_PERFORM: flashMessage(F("PERFORM MODE")); break;
     }
   }
 
