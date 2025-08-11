@@ -383,11 +383,14 @@ public:
     }
   }
 
-  ARDUINO_INLINE void startNote(byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
+  ARDUINO_INLINE void startNote(byte live_midi, byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
   {
-    for (byte v = 0; v < 3; ++v) {
-        if (v != op && voices[v]->isPlaying() && voices[v]->midi_note == midi_note) {
-            voices[v]->panic(); // terminate immediately
+    if (live_midi)
+    {
+        for (byte v = 0; v < 3; ++v) {
+            if (v != op && voices[v]->isPlaying() && voices[v]->midi_note == midi_note) {
+                voices[v]->panic(); // terminate immediately
+            }
         }
     }
     voices[op]->setInstrument(i);
@@ -408,7 +411,7 @@ public:
         if (!voices[a]->isPlaying())
         {
           // Start playing here
-          startNote(a, midi_note, instruments[channel & 0x7], 0, 0, 0);
+          startNote(true, a, midi_note, instruments[channel & 0x7], 0, 0, 0);
           found = true;
           break;
         }
@@ -423,7 +426,7 @@ public:
       }
       if (!found)
       {
-        startNote(oldest_voice, midi_note, instruments[channel & 0x7], 0, 0, 0);
+        startNote(true, oldest_voice, midi_note, instruments[channel & 0x7], 0, 0, 0);
       }
     }
     else
@@ -432,12 +435,12 @@ public:
       {
         for (byte a = 0; a < 3; a++)
         {
-          startNote(a, midi_note, instruments[channel & 0x7], 0, 0, 0, a);
+          startNote(true, a, midi_note, instruments[channel & 0x7], 0, 0, 0, a);
         }
       }
       else
       {
-        startNote(mono_voice, midi_note, instruments[channel & 0x7], 0, 0, 0);
+        startNote(true, mono_voice, midi_note, instruments[channel & 0x7], 0, 0, 0);
       }
       bool found = false;
       for (byte a = 0; a < 8; a++)
@@ -494,12 +497,12 @@ public:
         {
           for (byte a = 0; a < 3; a++)
           {
-            startNote(a, highest, instruments[channel & 0x7], 0, 0, 0, a);
+            startNote(true, a, highest, instruments[channel & 0x7], 0, 0, 0, a);
           }
         }
         else
         {
-          startNote(mono_voice, highest, instruments[channel & 0x7], 0, 0, 0);
+          startNote(true, mono_voice, highest, instruments[channel & 0x7], 0, 0, 0);
         }
       }
       else if (stop)

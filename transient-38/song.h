@@ -317,7 +317,7 @@ struct SONG
         }
         else if (note > 0)
         {
-          synth.startNote(v, note, instruments[n.getInstr()], n.getVolumeDecrement(), n.getVibrato(), n.getRamp());
+          synth.startNote(false, v, note, instruments[n.getInstr()], n.getVolumeDecrement(), n.getVibrato(), n.getRamp());
         }
         else
         {
