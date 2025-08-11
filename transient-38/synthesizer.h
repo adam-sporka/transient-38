@@ -41,41 +41,41 @@ struct INSTRUMENT
   byte forced_pitch = 0; // .mmmmmmm   MIDI note that is forced; 0 == no forcing
   const __FlashStringHelper* name;
 
-  __attribute__((always_inline)) inline byte getAtack() { return attack_decay & 0x07; }
-  __attribute__((always_inline)) inline byte isPercussive() { return attack_decay & INSTR_ENVELOPE_PERCUSSIVE; }
-  __attribute__((always_inline)) inline byte getDecay() { return (attack_decay & 0xf0) >> 4; }
+  ARDUINO_INLINE byte getAtack() { return attack_decay & 0x07; }
+  ARDUINO_INLINE byte isPercussive() { return attack_decay & INSTR_ENVELOPE_PERCUSSIVE; }
+  ARDUINO_INLINE byte getDecay() { return (attack_decay & 0xf0) >> 4; }
 
-  __attribute__((always_inline)) inline byte getDefaultVolume() { return defvolume_pwmf & 0x07; }
-  __attribute__((always_inline)) inline byte getPwmFactor() { return (defvolume_pwmf & 0x30) >> 4; }
-  __attribute__((always_inline)) inline bool doDelayedVibrato() { return defvolume_pwmf & INSTR_DELAYED_VIBRATO; } 
+  ARDUINO_INLINE byte getDefaultVolume() { return defvolume_pwmf & 0x07; }
+  ARDUINO_INLINE byte getPwmFactor() { return (defvolume_pwmf & 0x30) >> 4; }
+  ARDUINO_INLINE bool doDelayedVibrato() { return defvolume_pwmf & INSTR_DELAYED_VIBRATO; } 
 
-  __attribute__((always_inline)) inline byte getDropSpeed() { return (drop_flags & 0x7) ? 1 << ((drop_flags & 0x07) - 1) : 0; }
-  __attribute__((always_inline)) inline bool doNoise() { return drop_flags & INSTR_FLAG_IS_NOISE; }
-  __attribute__((always_inline)) inline bool doRetrig() { return drop_flags & INSTR_FLAG_DO_RETRIG; }
-  __attribute__((always_inline)) inline bool doRamp() { return drop_flags & INSTR_FLAG_DO_RAMP; }
-  __attribute__((always_inline)) inline bool doVibrato() { return drop_flags & INSTR_FLAG_DO_VIBRATO; }
-  __attribute__((always_inline)) inline bool doPwm() { return drop_flags & INSTR_FLAG_DO_PWM; }
+  ARDUINO_INLINE byte getDropSpeed() { return (drop_flags & 0x7) ? 1 << ((drop_flags & 0x07) - 1) : 0; }
+  ARDUINO_INLINE bool doNoise() { return drop_flags & INSTR_FLAG_IS_NOISE; }
+  ARDUINO_INLINE bool doRetrig() { return drop_flags & INSTR_FLAG_DO_RETRIG; }
+  ARDUINO_INLINE bool doRamp() { return drop_flags & INSTR_FLAG_DO_RAMP; }
+  ARDUINO_INLINE bool doVibrato() { return drop_flags & INSTR_FLAG_DO_VIBRATO; }
+  ARDUINO_INLINE bool doPwm() { return drop_flags & INSTR_FLAG_DO_PWM; }
 
-  __attribute__((always_inline)) inline byte getForcedPitch() { return forced_pitch; }
+  ARDUINO_INLINE byte getForcedPitch() { return forced_pitch; }
 
-  __attribute__((always_inline)) void setAttackDecay(byte attack, byte decay, bool percussive)
+  ARDUINO_INLINE void setAttackDecay(byte attack, byte decay, bool percussive)
   {
     attack_decay = (attack & 7) | (percussive ? INSTR_ENVELOPE_PERCUSSIVE : 0) | ((decay & 0xf) << 4);
   }
 
   // Volume = 0 .. 7
   // PWM factor = 0, 1, 2, 3
-  __attribute__((always_inline)) void setDefaultVolumePwm(byte volume, byte pwm_factor, bool delayed_vibrato)
+  ARDUINO_INLINE void setDefaultVolumePwm(byte volume, byte pwm_factor, bool delayed_vibrato)
   {
     defvolume_pwmf = (volume & 7) | ((pwm_factor & 3) << 4) | ((delayed_vibrato & 1) << 7);
   }
 
-  __attribute__((always_inline)) void setFlags(byte drop_speed, byte flags)
+  ARDUINO_INLINE void setFlags(byte drop_speed, byte flags)
   {
     drop_flags = (drop_speed & 7) | flags;
   }
 
-  __attribute__((always_inline)) void setForcedPitch(byte forced_pitch_)
+  ARDUINO_INLINE void setForcedPitch(byte forced_pitch_)
   {
     forced_pitch = forced_pitch_;
   }
@@ -196,7 +196,7 @@ public:
     if (v == 2) do_noise = true;
   }
 
-  __attribute__((always_inline)) void setInstrument(ARDUINO_VOLATILE INSTRUMENT &i)
+  ARDUINO_INLINE void setInstrument(ARDUINO_VOLATILE INSTRUMENT &i)
   {
     volume_envelope.setup(0, i.getDefaultVolume(), i.getAtack(), i.getDecay(), i.isPercussive());
     do_noise = i.doNoise();
@@ -210,7 +210,7 @@ public:
     do_delayed_vibrato = i.doDelayedVibrato();
   }
 
-  __attribute__((always_inline)) unsigned char onSample()
+  ARDUINO_INLINE unsigned char onSample()
   {
     if ((!volume_envelope.isPlaying()) || A == 0 || B == 0)
     {
@@ -239,7 +239,7 @@ public:
     return level ? current_volume : 0;
   }
 
-  __attribute__((always_inline)) void setPitch(unsigned char note, byte unison)
+  ARDUINO_INLINE void setPitch(unsigned char note, byte unison)
   {
     target_period = getPitch(forced_pitch ? forced_pitch : note);
     if (unison == 0) target_period += 1;
@@ -247,14 +247,14 @@ public:
     midi_note = note;
   }
 
-  __attribute__((always_inline)) void setRuntimeParams(signed char volume_decrement, bool do_vibrato_, bool do_ramp_)
+  ARDUINO_INLINE void setRuntimeParams(signed char volume_decrement, bool do_vibrato_, bool do_ramp_)
   {
     current_volume_decrement = volume_decrement;
     if (do_vibrato_) do_vibrato = true;
     if (do_ramp_) do_ramp = true;
   }
 
-  __attribute__((always_inline)) void gateOn()
+  ARDUINO_INLINE void gateOn()
   {
     if (!volume_envelope.isPlaying())
     {
@@ -264,17 +264,17 @@ public:
     age = 0;
   }
 
-  __attribute__((always_inline)) bool isPlaying()
+  ARDUINO_INLINE bool isPlaying()
   {
     return mark_gate_on || volume_envelope.isPlaying();
   }
 
-  __attribute__((always_inline)) void gateOff()
+  ARDUINO_INLINE void gateOff()
   {
     mark_gate_off = true;
   }
 
-  __attribute__((always_inline)) void panic()
+  ARDUINO_INLINE void panic()
   {
     volume_envelope.panic();
   }
@@ -383,7 +383,7 @@ public:
     }
   }
 
-  __attribute__((always_inline)) inline void startNote(byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
+  ARDUINO_INLINE void startNote(byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
   {
     for (byte v = 0; v < 3; ++v) {
         if (v != op && voices[v]->isPlaying() && voices[v]->midi_note == midi_note) {
@@ -396,7 +396,7 @@ public:
     voices[op]->gateOn();
   }
 
-  __attribute__((always_inline)) inline void onMidiNoteOn(byte channel, byte midi_note, byte velocity)
+  ARDUINO_INLINE void onMidiNoteOn(byte channel, byte midi_note, byte velocity)
   {
     if (mono_voice == 0xff)
     {
@@ -456,7 +456,7 @@ public:
     }
   }
 
-  __attribute__((always_inline)) inline void onMidiNoteOff(byte channel, byte midi_note, byte velocity)
+  ARDUINO_INLINE void onMidiNoteOff(byte channel, byte midi_note, byte velocity)
   {
     if (mono_voice == 0xff)
     {
@@ -519,17 +519,17 @@ public:
     }
   }
 
-  __attribute__((always_inline)) inline void setRuntimeParams(byte op, signed char volume_decrement, bool do_vibrato, bool do_ramp)
+  ARDUINO_INLINE void setRuntimeParams(byte op, signed char volume_decrement, bool do_vibrato, bool do_ramp)
   {
     voices[op]->setRuntimeParams(volume_decrement, do_vibrato, do_ramp);
   }
 
-  __attribute__((always_inline)) inline void endNote(byte op)
+  ARDUINO_INLINE void endNote(byte op)
   {
     voices[op]->gateOff();
   }
 
-  __attribute__((always_inline)) inline void panic()
+  ARDUINO_INLINE void panic()
   {
     voices[0]->panic();
     voices[1]->panic();
@@ -542,7 +542,7 @@ public:
   }
 
 #ifdef ARDUINO
-  __attribute__((always_inline)) inline byte onSample()
+  ARDUINO_INLINE byte onSample()
   {
     byte update_thread = 0;
     // samples_served++;
@@ -621,7 +621,7 @@ public:
   }
 #endif
 
-  __attribute__((always_inline)) inline void onTick()
+  ARDUINO_INLINE void onTick()
   {
     // ticks_served++;
 

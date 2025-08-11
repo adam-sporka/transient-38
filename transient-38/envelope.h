@@ -23,12 +23,12 @@ struct ENVELOPE
     oneshot = oneshot_;
   }
 
-  __attribute__((always_inline)) inline bool isPlaying()
+  ARDUINO_INLINE bool isPlaying()
   {
     return phase != ENV_PHASE_OUTSIDE;
   }
 
-  __attribute__((always_inline)) inline void gateOn(bool do_retrig)
+  ARDUINO_INLINE void gateOn(bool do_retrig)
   {
     if (do_retrig || ((!do_retrig) && (phase != ENV_PHASE_HOLD)))
     {
@@ -38,27 +38,27 @@ struct ENVELOPE
     }
   }
 
-  __attribute__((always_inline)) inline void gateOff()
+  ARDUINO_INLINE void gateOff()
   {
     phase = ENV_PHASE_DECAY;
     counter = 0;
   }
 
-  __attribute__((always_inline)) inline void kill()
+  ARDUINO_INLINE void kill()
   {
     phase = ENV_PHASE_OUTSIDE;
     val = min;
     counter = 0;
   }
 
-  __attribute__((always_inline)) inline void panic()
+  ARDUINO_INLINE void panic()
   {
     phase = ENV_PHASE_OUTSIDE;
     val = min;
     counter = 0;
   }
 
-  __attribute__((always_inline)) inline void update()
+  ARDUINO_INLINE void update()
   {
     if (phase == ENV_PHASE_OUTSIDE)
     {

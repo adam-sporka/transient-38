@@ -1,4 +1,5 @@
 #define ARDUINO_VOLATILE volatile
+#define ARDUINO_INLINE __attribute__((always_inline))
 
 ////////////////////////////////////////////////////////////////
 // LCD

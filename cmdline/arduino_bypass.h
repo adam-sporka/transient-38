@@ -3,6 +3,7 @@ using byte = unsigned char;
 using __FlashStringHelper = char;
 #define F(X) (X)
 #define ARDUINO_VOLATILE
+#define ARDUINO_INLINE inline
 
 void WriteAt(short x, short y, const char* text)
 {
