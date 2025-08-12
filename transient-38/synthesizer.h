@@ -254,11 +254,18 @@ public:
     if (do_ramp_) do_ramp = true;
   }
 
-  ARDUINO_INLINE void gateOn()
+  ARDUINO_INLINE void gateOn(bool force_restart = false)
   {
-    if (!volume_envelope.isPlaying())
+    if (force_restart)
     {
-      current_period = target_period;
+      volume_envelope.gateOn(true);
+    }
+    else
+    {
+      if (!volume_envelope.isPlaying())
+      {
+        current_period = target_period;
+      }
     }
     mark_gate_on = true;
     age = 0;
@@ -277,6 +284,7 @@ public:
   ARDUINO_INLINE void panic()
   {
     volume_envelope.panic();
+    mark_gate_on = false;
   }
 
   void onTick()
@@ -385,25 +393,39 @@ public:
 
   ARDUINO_INLINE void startNote(byte live_midi, byte op, byte midi_note, ARDUINO_VOLATILE INSTRUMENT &i, signed char volume_decrement, bool do_vibrato, bool do_ramp, byte unison = 0xff)
   {
+    bool force_restart = false;
     if (live_midi)
     {
+      if (mono_voice == 0xff)
+      {
+        bool did_terminate = false;
         for (byte v = 0; v < 3; ++v) {
-            if (v != op && voices[v]->isPlaying() && voices[v]->midi_note == midi_note) {
-                voices[v]->panic(); // terminate immediately
-            }
+          if ((v != op) && (voices[v]->isPlaying()) && (voices[v]->midi_note == midi_note)) {
+            voices[v]->panic(); // terminate immediately
+            did_terminate = true;
+          }
         }
+        if (!did_terminate)
+        {
+          if (voices[op]->isPlaying())
+          {
+            voices[op]->panic();
+            force_restart = true;
+          }
+        }
+      }
     }
     voices[op]->setInstrument(i);
     voices[op]->setRuntimeParams(volume_decrement, do_vibrato, do_ramp);
     voices[op]->setPitch(midi_note, unison);
-    voices[op]->gateOn();
+    voices[op]->gateOn(force_restart);
   }
 
   ARDUINO_INLINE void onMidiNoteOn(byte channel, byte midi_note, byte velocity)
   {
     if (mono_voice == 0xff)
     {
-      bool found = false;
+      bool found_not_playing = false;
       unsigned int highest_age = 0;
       byte oldest_voice = 0xff;
       for (int a = 0; a < 3; a++)
@@ -412,7 +434,7 @@ public:
         {
           // Start playing here
           startNote(true, a, midi_note, instruments[channel & 0x7], 0, 0, 0);
-          found = true;
+          found_not_playing = true;
           break;
         }
         else
@@ -424,8 +446,9 @@ public:
           }
         }
       }
-      if (!found)
+      if (!found_not_playing)
       {
+        voices[oldest_voice]->panic();
         startNote(true, oldest_voice, midi_note, instruments[channel & 0x7], 0, 0, 0);
       }
     }

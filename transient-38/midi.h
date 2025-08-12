@@ -33,6 +33,11 @@ ARDUINO_INLINE checkMIDI_Internal()
       return;
     }
 
+    if (midi_input == 248)
+    {
+      return;
+    }
+ 
     if (params_remaining == 0)
     {
       if (midi_input < 128)
