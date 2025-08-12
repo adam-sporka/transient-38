@@ -132,7 +132,7 @@ public:
   // To complete one scanning cycle, you need 26 calls of this function.
   // However, each call only does very little, so you can safely use this
   // in a kHz timer callback.
-  void update()
+  ARDUINO_INLINE void update()
   {
     byte current_instruction = scanlist[step] & 0xf0;
     byte current_parameter = scanlist[step] & 0x0f;
@@ -188,14 +188,14 @@ public:
     }
   }
 
-  bool isPressed(byte key)
+  ARDUINO_INLINE bool isPressed(byte key)
   {
     uint16_t weight = 1 << key;
     bool b = held & weight;
     return b;
   }
 
-  bool consumePressed(byte key)
+  ARDUINO_INLINE bool consumePressed(byte key)
   {
     uint16_t weight = 1 << key;
     bool b = pressed & weight;
@@ -203,7 +203,7 @@ public:
     return b;
   }
 
-  bool consumePressedDigit(byte& out)
+  ARDUINO_INLINE bool consumePressedDigit(byte& out)
   {
     if (consumePressed(KEY_DIGIT_0)) { out = 0; return true; }
     if (consumePressed(KEY_DIGIT_1)) { out = 1; return true; }
@@ -220,7 +220,7 @@ public:
 
   // Return 0 for no key detected.
   // Return 1--16 if a key has been pressed.
-  byte getLastKey()
+  ARDUINO_INLINE byte getLastKey()
   {
     byte to_report = last_key;
     last_key = 0xff;

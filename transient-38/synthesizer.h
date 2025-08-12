@@ -18,8 +18,8 @@ LFO pwm;
 
 #define INSTR_DELAYED_VIBRATO     0x80
 
-#define CONTROL_BUFFER_LENGTH 8
-#define CONTROL_BUFFER_MASK 7
+#define CONTROL_BUFFER_LENGTH 4
+#define CONTROL_BUFFER_MASK 3
 
 volatile byte midi_note_in_[CONTROL_BUFFER_LENGTH];
 volatile byte midi_note_in_channel_[CONTROL_BUFFER_LENGTH];
@@ -552,13 +552,6 @@ public:
 
     // now = next_value << 2;
     PORTB = (PORTB & 0b11000011) | ((next_value & 0xf) << 2);
-
-    // Write thre _previous_ values, so that this happens as the first operation of the interrupt handler.
-    // Also, write only if there is a change.
-    //now = next_value & 1; if ((last1 & !now) | (!last1 & now)) { digitalWrite(10, now); last1 = now; }
-    //now = next_value & 2; if ((last2 & !now) | (!last2 & now)) { digitalWrite(11, now); last2 = now; }
-    //now = next_value & 4; if ((last3 & !now) | (!last3 & now)) { digitalWrite(12, now); last3 = now; }
-    //now = next_value & 8; if ((last4 & !now) | (!last4 & now)) { digitalWrite(13, now); last4 = now; }
 
     while (midi_note_in_rd != midi_note_in_wr)
     {

@@ -6,7 +6,7 @@ uint8_t random_pos_byte = 0;
 uint8_t random_pos_bit = 1;
 uint8_t random_byte = 145;
 
-inline uint8_t getRandom8()
+ARDUINO_INLINE uint8_t getRandom8()
 {
   if (random_pos_bit != 128) random_pos_bit = random_pos_bit << 1;
   else

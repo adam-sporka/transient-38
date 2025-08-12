@@ -67,5 +67,6 @@
     <None Include="arduino_bypass.inc">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

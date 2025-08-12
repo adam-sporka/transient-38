@@ -9,12 +9,12 @@ const uint16_t PROGMEM pitches[128] = {
   4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2 };
 const char PROGMEM chars[] = "   111222333444555666777888999AAA";
 
-inline uint16_t getPitch(unsigned char midi_note)
+ARDUINO_INLINE uint16_t getPitch(unsigned char midi_note)
 {
   return pgm_read_word(pitches + midi_note);
 }
 
-inline byte getOctave(byte note)
+ARDUINO_INLINE byte getOctave(byte note)
 {
     byte octave = note >> 2;
     return pgm_read_byte(&chars[octave]);

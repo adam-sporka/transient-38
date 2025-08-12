@@ -6,7 +6,7 @@ byte params_remaining = 0;
 byte commandByte;
 byte is_sysex = 0;
 
-void checkMIDI()
+ARDUINO_INLINE checkMIDI_Internal()
 {
   if (midi_panic == 1)
   {
@@ -79,6 +79,11 @@ void checkMIDI()
       params_remaining--;
     }
   }
+}
+
+ARDUINO_INLINE void checkMIDI()
+{
+  checkMIDI_Internal();
 }
     
 #endif

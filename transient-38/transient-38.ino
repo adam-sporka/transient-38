@@ -71,8 +71,6 @@ unsigned char midi_tick = 15;
 
 ISR(TIMER1_COMPA_vect)
 {
-  checkMIDI();
-
   bool update_thread = synth.onSample();
   if (update_thread == 1)
   {
@@ -94,6 +92,7 @@ ISR(TIMER1_COMPA_vect)
 unsigned int loop_div = 0;
 void loop()
 {
+  checkMIDI();
   if (loop_div == 0) {
     loop_div = 1024;
     editor.updateFromLoop();

@@ -8,6 +8,8 @@
 #include "arduino_bypass.h"
 #include "../transient-38/main.h"
 
+#include <pix3.h>
+
 #define SAMPLE_RATE 32000
 #define BUFLEN 4096
 #define CHANNELS 1
@@ -29,6 +31,8 @@ void InitSong()
 ////////////////////////////////////////////////////////////////
 byte GetSample()
 {
+    PIXScopedEvent(PIX_COLOR_INDEX(1), L"GetSample");
+
     bool should_update_song;
     byte sample = synth.getSample(should_update_song);
     sample *= 6;
@@ -36,6 +40,7 @@ byte GetSample()
     {
         song.onTick_();
     }
+
     return sample;
 }
 
